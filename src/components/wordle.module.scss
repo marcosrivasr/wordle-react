@@ -1,0 +1,24 @@
+@import "./variables.scss";
+
+.mainContainer {
+  width: ($size * 5) + ($gap * 5);
+  margin: 100px auto;
+}
+.box {
+  font-size: 2em;
+  font-weight: bold;
+  width: $size;
+  height: $size;
+  border: solid 2px #555;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.row {
+  display: flex;
+  gap: $gap;
+  margin-bottom: $gap;
+  text-transform: uppercase;
+}
