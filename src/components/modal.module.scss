@@ -1,0 +1,34 @@
+.modalViewContainer {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalContainer {
+  background-color: white;
+  border-radius: 3px;
+  padding: 10px;
+  width: 500px;
+  min-height: 300px;
+
+  h2 {
+    text-align: center;
+    font-size: 36px;
+  }
+}
+
+.puzzle {
+  width: 200px;
+  margin: 0 auto;
+  font-size: 30px;
+}
+
+.puzzleWord {
+  display: flex;
+}
