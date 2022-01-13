@@ -13,7 +13,7 @@ export function getWordOfTheDay() {
 
 export function isValidWord(word: string) {
   const words = getWords();
-  return words.includes(word);
+  return words.includes(word.toLowerCase());
 }
 
 function getDayOfTheYear() {
