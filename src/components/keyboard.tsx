@@ -1,7 +1,5 @@
 import styles from "./keyboard.module.scss";
 import classNames from "classnames/bind";
-import { checkLetter } from "../service/request";
-import { MouseEventHandler } from "react";
 
 interface KeyboardProps {
   keys: string[];
