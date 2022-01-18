@@ -1,13 +1,14 @@
-import styles from "./wordle.module.scss";
 import { useEffect, useState } from "react";
-import EmptyRow from "./emptyRow";
-import CompletedRow from "./completedRow";
-import { getWordOfTheDay, isValidWord } from "../service/request";
-import CurrentRow from "./currentRow";
 import { useWindow } from "../hooks/useWindow";
-import { GameStatus } from "./types";
+import { getWordOfTheDay, isValidWord } from "../service/request";
 import Keyboard from "./keyboard";
 import Modal from "./modal";
+import RowCompleted from "./completedRow";
+import RowCurrent from "./currentRow";
+import RowEmpty from "./emptyRow";
+import { GameStatus } from "./types";
+
+import styles from "./wordle.module.scss";
 
 const keys = [
   "Q",
@@ -41,9 +42,9 @@ const keys = [
 export default function Wordle() {
   const [wordOfTheDay, setWordOfTheDay] = useState<string>("");
   const [turn, setTurn] = useState<number>(1);
-  const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.Playing);
   const [currentWord, setCurrentWord] = useState<string>("");
   const [completedWords, setCompletedWords] = useState<string[]>([]);
+  const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.Playing);
 
   useWindow("keydown", handleKeyDown);
 
@@ -51,53 +52,39 @@ export default function Wordle() {
     setWordOfTheDay(getWordOfTheDay());
   }, []);
 
-  function handleKeyDown(event: any) {
-    const letter = event.key.toUpperCase();
+  function handleKeyDown(event: KeyboardEvent) {
+    const key = event.key.toUpperCase();
 
-    if (event.key === "Backspace" && currentWord.length > 0) {
+    onKeyPressed(key);
+  }
+
+  function onKeyPressed(key: string) {
+    if (gameStatus !== GameStatus.Playing) {
+      return;
+    }
+
+    if (key === "BACKSPACE" && currentWord.length > 0) {
       onDelete();
       return;
     }
 
-    if (event.key === "Enter") {
+    if (key === "ENTER" && currentWord.length === 5 && turn <= 6) {
       onEnter();
       return;
     }
 
     if (currentWord.length >= 5) return;
 
-    if (keys.includes(letter)) {
-      onInput(letter);
+    // ingresar la letra al estado
+    if (keys.includes(key)) {
+      onInput(key);
       return;
     }
   }
 
-  function onEnter() {
-    //if letter is not length 5, return
-    if (currentWord.length < 5) {
-      return;
-    }
-    //if letter is the word of the day you win
-    if (currentWord === wordOfTheDay) {
-      setCompletedWords([...completedWords, currentWord]);
-      setGameStatus(GameStatus.Won);
-      return;
-    }
-    //if the turn is 6 and no word is found you lose
-    if (turn === 6) {
-      setCompletedWords([...completedWords, currentWord]);
-      setGameStatus(GameStatus.Lost);
-      return;
-    }
-
-    if (currentWord.length === 5 && !isValidWord(currentWord)) {
-      alert("Not a valid word");
-      return;
-    }
-
-    setCompletedWords([...completedWords, currentWord]);
-    setTurn(turn + 1);
-    setCurrentWord("");
+  function onInput(letter: string) {
+    const newWord = currentWord + letter;
+    setCurrentWord(newWord);
   }
 
   function onDelete() {
@@ -105,12 +92,32 @@ export default function Wordle() {
     setCurrentWord(newWord);
   }
 
-  function onInput(letter: string) {
-    if (currentWord.length >= 5) {
+  async function onEnter() {
+    if (currentWord === wordOfTheDay) {
+      //ganó el usuario
+      setCompletedWords([...completedWords, currentWord]);
+      setGameStatus(GameStatus.Won);
       return;
     }
-    const newWord = currentWord + letter;
-    setCurrentWord(newWord);
+
+    if (turn === 6) {
+      //perdió el usuario
+      setCompletedWords([...completedWords, currentWord]);
+      setGameStatus(GameStatus.Lost);
+      return;
+    }
+
+    // validar si existe la palabra
+    const validWord = await isValidWord(currentWord);
+
+    if (currentWord.length === 5 && !validWord) {
+      alert("Not a valid word");
+      return;
+    }
+
+    setCompletedWords([...completedWords, currentWord]);
+    setTurn(turn + 1);
+    setCurrentWord("");
   }
 
   return (
@@ -130,22 +137,24 @@ export default function Wordle() {
       ) : null}
       <div className={styles.mainContainer}>
         {completedWords.map((word, i) => (
-          <CompletedRow key={i} word={word} solution={wordOfTheDay} />
+          <RowCompleted
+            key={i}
+            word={word}
+            solution={wordOfTheDay}
+            animate={true}
+          />
         ))}
-        {gameStatus === GameStatus.Won ? null : (
-          <CurrentRow word={currentWord} />
-        )}
+
+        {gameStatus === GameStatus.Playing ? (
+          <RowCurrent word={currentWord} />
+        ) : null}
 
         {Array.from(Array(6 - turn)).map((_, i) => (
-          <EmptyRow key={i} />
+          <RowEmpty key={i} />
         ))}
       </div>
-      <Keyboard
-        keys={keys}
-        onInput={onInput}
-        onDelete={onDelete}
-        onEnter={onEnter}
-      />
+
+      <Keyboard keys={keys} onKeyPressed={onKeyPressed} />
     </>
   );
 }

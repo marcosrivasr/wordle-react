@@ -1,52 +1,33 @@
 import styles from "./keyboard.module.scss";
-import classNames from "classnames/bind";
 
 interface KeyboardProps {
   keys: string[];
-  onInput: (letter: string) => void;
-  onEnter: () => void;
-  onDelete: () => void;
+  onKeyPressed: (key: string) => void;
 }
 
-const classes = classNames.bind(styles);
-
-export default function Keyboard({
-  keys,
-  onInput,
-  onEnter,
-  onDelete,
-}: KeyboardProps) {
-  function getStyle(letter: string, pos: number) {
-    const keyStyles = classes(styles.key);
-
-    return keyStyles;
-  }
-
+export default function Keyboard({ keys, onKeyPressed }: KeyboardProps) {
   function handleInput(e: any) {
-    onInput(e.target.textContent);
+    onKeyPressed(e.target.textContent);
   }
 
   function handleEnter(e: any) {
-    onEnter();
+    onKeyPressed("ENTER");
   }
+
   function handleDelete(e: any) {
-    onDelete();
+    onKeyPressed("BACKSPACE");
   }
 
   return (
     <div className={styles.keyboardContainer}>
       {Array.from(Array(10)).map((_, i) => (
-        <button key={i} className={getStyle(keys[i], i)} onClick={handleInput}>
+        <button key={i} className={styles.key} onClick={handleInput}>
           {keys[i]}
         </button>
       ))}
       <div className={styles.emptyKey}></div>
       {Array.from(Array(9)).map((_, i) => (
-        <button
-          key={i + 10}
-          className={getStyle(keys[i], i)}
-          onClick={handleInput}
-        >
+        <button key={i + 10} className={styles.key} onClick={handleInput}>
           {keys[i + 10]}
         </button>
       ))}
@@ -54,11 +35,7 @@ export default function Keyboard({
         ENTER
       </button>
       {Array.from(Array(7)).map((_, i) => (
-        <button
-          key={i + 19}
-          className={getStyle(keys[i], i)}
-          onClick={handleInput}
-        >
+        <button key={i + 19} className={styles.key} onClick={handleInput}>
           {keys[i + 19]}
         </button>
       ))}

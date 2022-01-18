@@ -5,9 +5,14 @@ import { BoxStatus } from "./types";
 interface CompletedRowProps {
   word: string;
   solution: string;
+  animate: boolean;
 }
 
-export default function CompletedRow({ word, solution }: CompletedRowProps) {
+export default function CompletedRow({
+  word,
+  solution,
+  animate = false,
+}: CompletedRowProps) {
   const arr = Array.from(Array(5));
 
   function checkLetter(letter: string, pos: number): BoxStatus {
@@ -25,7 +30,13 @@ export default function CompletedRow({ word, solution }: CompletedRowProps) {
   return (
     <div className={styles.row}>
       {arr.map((_, i) => (
-        <Box key={i} value={word[i]} status={checkLetter(word[i], i)} />
+        <Box
+          key={i}
+          value={word[i]}
+          status={checkLetter(word[i], i)}
+          animate={animate}
+          pos={i}
+        />
       ))}
     </div>
   );

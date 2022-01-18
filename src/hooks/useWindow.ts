@@ -1,14 +1,11 @@
 import { useEffect } from "react";
 
-export function useWindow(
-  eventName: keyof WindowEventMap,
-  callback: (event: WindowEventMap[keyof WindowEventMap]) => void
-) {
+export function useWindow(eventName: keyof WindowEventMap, callback: any) {
   useEffect(() => {
-    window.addEventListener(eventName, callback, false);
+    window.addEventListener(eventName, callback);
 
-    return function () {
-      window.removeEventListener(eventName, callback, false);
+    return () => {
+      window.removeEventListener(eventName, callback);
     };
   });
 }
